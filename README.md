@@ -1,1 +1,3 @@
+
+https://www.overleaf.com/project/664d9cd16c57ee985e091059
 This paper presents a comprehensive study of Rate Monotonic Scheduling (RMS), a widely-used fixed-priority algorithm for real-time systems. We explore the theoretical foundations of RMS, provide detailed modeling using UPPAAL, and demonstrate practical implementation in C. The UPPAAL model verifies the correctness of RMS by simulating task execution and preemption, ensuring tasks meet their deadlines. The C implementation validates the algorithm’s practical application, showing how tasks with shorter periods preempt those with longer periods. Results confirm the efficacy of RMS in managing real-time tasks, highlighting its importance in systems with stringent timing requirements.
