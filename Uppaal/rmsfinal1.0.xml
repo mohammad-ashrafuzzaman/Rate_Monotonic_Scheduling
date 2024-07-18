@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+
+    const int N = 3; // Number of tasks
+clock global;
+    clock g;
+    int p1 = 4; 
+    int c1 = 2;
+    int p2 = 10;
+    int c2 = 5;
+int task1_count;
+int task2_count;
+    chan requestCPU1, requestCPU2, requestCPU3;
+    chan releaseCPU1, releaseCPU2, releaseCPU3;
+    const int priorities[N] = {1, 2, 3}; // Define priorities for each task (higher value means lower priority)
+     chan start_T1, start_T2;
+  broadcast chan preempt_p1, preempt_p2, T1_done, T2_done;
+int pre_1=0;
+int pre_2 = 0;
+ clock binit =0;
+   broadcast chan Task1_failure, Task2_failure;
+int cpu_status;</declaration>
+	<template>
+		<name x="5" y="5">Task1</name>
+		<declaration>// Place local declarations here.
+ clock a;</declaration>
+		<location id="id0" x="-518" y="-221">
+			<name x="-528" y="-255">Task1_waiting</name>
+		</location>
+		<location id="id1" x="-126" y="26">
+		</location>
+		<location id="id2" x="26" y="-136">
+			<name x="35" y="-128">Executing</name>
+		</location>
+		<location id="id3" x="-203" y="-340">
+		</location>
+		<location id="id4" x="205" y="322">
+			<name x="222" y="339">p1_Preempted</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id5">
+			<source ref="id4"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-110" y="186">start_T1?</label>
+			<nail x="-118" y="144"/>
+		</transition>
+		<transition id="id6">
+			<source ref="id3"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-339" y="-255">T1_done!</label>
+			<label kind="assignment" x="-611" y="-340">task1_count:=task1_count+1,cpu_status:=0</label>
+		</transition>
+		<transition id="id7">
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-76" y="-349">a==c1</label>
+			<label kind="synchronisation" x="-110" y="-366">releaseCPU1?</label>
+			<label kind="assignment" x="-144" y="-391">a:=0,cpu_status:=1</label>
+			<nail x="18" y="-145"/>
+			<nail x="-118" y="-264"/>
+			<nail x="-84" y="-332"/>
+		</transition>
+		<transition id="id8">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-109" y="-21">requestCPU1!</label>
+			<label kind="assignment" x="-109" y="-4">a:=0</label>
+			<nail x="-92" y="-34"/>
+			<nail x="-75" y="-68"/>
+		</transition>
+		<transition id="id9">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-415" y="-51">start_T1?</label>
+			<label kind="assignment" x="-398" y="-76">a:=0</label>
+			<nail x="-296" y="26"/>
+		</transition>
+		<transition id="id10">
+			<source ref="id0"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-432" y="288">preempt_p1?</label>
+			<label kind="assignment" x="-432" y="326">pre_1:=0</label>
+			<nail x="-450" y="237"/>
+		</transition>
+		<transition id="id11">
+			<source ref="id2"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="60" y="76">preempt_p1?</label>
+		</transition>
+		<transition id="id12">
+			<source ref="id1"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-59" y="110">preempt_p1?</label>
+			<label kind="assignment" x="-42" y="229">pre_1:=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>scheduler</name>
+		<location id="id13" x="-340" y="-110">
+			<name x="-350" y="-144">Idle</name>
+		</location>
+		<location id="id14" x="8" y="-25">
+			<name x="-2" y="-59">Task2_Executing</name>
+		</location>
+		<location id="id15" x="-314" y="229">
+			<name x="-433" y="263">Task1_Executing</name>
+		</location>
+		<init ref="id13"/>
+		<transition id="id16">
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="guard" x="102" y="-203">pre_2 == 1</label>
+			<label kind="synchronisation" x="119" y="-229">preempt_p2?</label>
+			<nail x="204" y="-8"/>
+			<nail x="255" y="-195"/>
+			<nail x="-68" y="-229"/>
+		</transition>
+		<transition id="id17">
+			<source ref="id15"/>
+			<target ref="id13"/>
+			<label kind="guard" x="-697" y="170">pre_1 == 1</label>
+			<label kind="synchronisation" x="-705" y="204">preempt_p1?</label>
+			<nail x="-654" y="289"/>
+			<nail x="-790" y="221"/>
+		</transition>
+		<transition id="id18">
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="guard" x="-34" y="17">pre_2==0</label>
+			<label kind="synchronisation" x="-110" y="59">releaseCPU2!</label>
+			<nail x="-110" y="68"/>
+		</transition>
+		<transition id="id19">
+			<source ref="id13"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-170" y="-93">requestCPU2?</label>
+		</transition>
+		<transition id="id20">
+			<source ref="id15"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-484" y="93">releaseCPU1!</label>
+			<nail x="-442" y="59"/>
+		</transition>
+		<transition id="id21">
+			<source ref="id13"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="-289" y="42">requestCPU1?</label>
+			<nail x="-127" y="204"/>
+		</transition>
+	</template>
+	<template>
+		<name>Task2</name>
+		<declaration>clock b;</declaration>
+		<location id="id22" x="-102" y="-34">
+			<name x="-112" y="-68">Executing</name>
+		</location>
+		<location id="id23" x="-773" y="-136">
+			<name x="-875" y="-178">Task2_waiting</name>
+		</location>
+		<location id="id24" x="-603" y="-8">
+		</location>
+		<location id="id25" x="-527" y="459">
+			<name x="-510" y="476">p2_Preempted</name>
+		</location>
+		<location id="id26" x="-518" y="-246">
+		</location>
+		<init ref="id23"/>
+		<transition id="id27">
+			<source ref="id25"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-611" y="13">start_T2?</label>
+			<label kind="assignment" x="-518" y="127">pre_2:=0</label>
+			<nail x="-493" y="85"/>
+			<nail x="-493" y="76"/>
+		</transition>
+		<transition id="id28">
+			<source ref="id23"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-892" y="221">preempt_p2?</label>
+			<label kind="assignment" x="-789" y="293">pre_2:=0</label>
+			<nail x="-807" y="204"/>
+		</transition>
+		<transition id="id29">
+			<source ref="id26"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-697" y="-229">T2_done!</label>
+			<label kind="assignment" x="-858" y="-306">task2_count:=task2_count+1,cpu_status:=0</label>
+		</transition>
+		<transition id="id30">
+			<source ref="id22"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-331" y="144">preempt_p2?</label>
+		</transition>
+		<transition id="id31">
+			<source ref="id24"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-663" y="178">preempt_p2?</label>
+			<label kind="assignment" x="-620" y="204">pre_2:=0</label>
+		</transition>
+		<transition id="id32">
+			<source ref="id22"/>
+			<target ref="id26"/>
+			<label kind="guard" x="-442" y="-229">b==c2</label>
+			<label kind="synchronisation" x="-348" y="-178">releaseCPU2?</label>
+			<label kind="assignment" x="-391" y="-212">binit:=b, b:=0,cpu_status:=1</label>
+		</transition>
+		<transition id="id33">
+			<source ref="id24"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-511" y="-50">requestCPU2!</label>
+			<label kind="assignment" x="-460" y="-33">b:=0</label>
+			<nail x="-425" y="-8"/>
+			<nail x="-365" y="-8"/>
+		</transition>
+		<transition id="id34">
+			<source ref="id23"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-748" y="-68">start_T2?</label>
+			<label kind="assignment" x="-731" y="-42">b:=0</label>
+			<nail x="-654" y="59"/>
+		</transition>
+	</template>
+	<template>
+		<name>period_checker</name>
+		<declaration>int pi_1 = 0;
+int pi_2 = 0;
+
+clock e;</declaration>
+		<location id="id35" x="-374" y="-144">
+		</location>
+		<location id="id36" x="-119" y="-127">
+			<name x="-129" y="-161">p2_piority</name>
+		</location>
+		<location id="id37" x="-357" y="59">
+			<name x="-367" y="25">p1_piority</name>
+		</location>
+		<location id="id38" x="119" y="153">
+			<name x="136" y="170">Task_start</name>
+		</location>
+		<location id="id39" x="-187" y="331">
+			<name x="-280" y="331">preempting</name>
+		</location>
+		<location id="id40" x="178" y="365">
+			<name x="168" y="331">Begin_Task2</name>
+		</location>
+		<location id="id41" x="-204" y="552">
+			<name x="-263" y="586">Taks2_executing</name>
+		</location>
+		<location id="id42" x="110" y="-136">
+			<name x="102" y="-187">Taks1_executing</name>
+		</location>
+		<location id="id43" x="620" y="-144">
+			<name x="637" y="-178">Preemting</name>
+		</location>
+		<location id="id44" x="476" y="93">
+			<name x="459" y="119">Begin_next_Task</name>
+		</location>
+		<init ref="id35"/>
+		<transition id="id45">
+			<source ref="id36"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="161" y="17">T2_done?</label>
+		</transition>
+		<transition id="id46">
+			<source ref="id37"/>
+			<target ref="id40"/>
+			<label kind="synchronisation" x="-153" y="221">T1_done?</label>
+		</transition>
+		<transition id="id47">
+			<source ref="id43"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="357" y="-289">preempt_p1!</label>
+			<label kind="assignment" x="416" y="-263">e:=0</label>
+			<nail x="263" y="-297"/>
+		</transition>
+		<transition id="id48">
+			<source ref="id42"/>
+			<target ref="id43"/>
+			<label kind="guard" x="374" y="-170">e==p2</label>
+			<label kind="assignment" x="297" y="-170">pre_1:=1</label>
+		</transition>
+		<transition id="id49">
+			<source ref="id44"/>
+			<target ref="id43"/>
+			<label kind="guard" x="569" y="-17">e==p2</label>
+			<label kind="assignment" x="552" y="0">pre_1:=1</label>
+		</transition>
+		<transition id="id50">
+			<source ref="id42"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-110" y="-204">T1_done?</label>
+			<nail x="76" y="-212"/>
+			<nail x="-348" y="-212"/>
+		</transition>
+		<transition id="id51">
+			<source ref="id44"/>
+			<target ref="id42"/>
+			<label kind="synchronisation" x="272" y="-59">start_T1!</label>
+		</transition>
+		<transition id="id52">
+			<source ref="id38"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="246" y="127">T2_done?</label>
+		</transition>
+		<transition id="id53">
+			<source ref="id41"/>
+			<target ref="id39"/>
+			<label kind="guard" x="-246" y="399">e ==p1</label>
+			<label kind="assignment" x="-204" y="416">pre_2:=1</label>
+		</transition>
+		<transition id="id54">
+			<source ref="id41"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-544" y="340">T2_done?</label>
+			<nail x="-603" y="229"/>
+		</transition>
+		<transition id="id55">
+			<source ref="id40"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="51" y="399">start_T2!</label>
+		</transition>
+		<transition id="id56">
+			<source ref="id38"/>
+			<target ref="id40"/>
+			<label kind="synchronisation" x="-8" y="204">T1_done?</label>
+		</transition>
+		<transition id="id57">
+			<source ref="id39"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-442" y="212">preempt_p2!</label>
+			<label kind="assignment" x="-399" y="238">e:=0</label>
+			<nail x="-357" y="187"/>
+		</transition>
+		<transition id="id58">
+			<source ref="id40"/>
+			<target ref="id39"/>
+			<label kind="guard" x="-76" y="289">e==p1</label>
+			<label kind="assignment" x="-169" y="318">pre_2:=1</label>
+		</transition>
+		<transition id="id59">
+			<source ref="id36"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="42" y="42">start_T2!</label>
+			<label kind="assignment" x="17" y="17">g:=0</label>
+		</transition>
+		<transition id="id60">
+			<source ref="id37"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-221" y="59">start_T1!</label>
+			<label kind="assignment" x="-161" y="76">g:=0, e:=0</label>
+		</transition>
+		<transition id="id61">
+			<source ref="id35"/>
+			<target ref="id37"/>
+			<label kind="guard" x="-425" y="-42">p1 &lt; p2</label>
+			<label kind="assignment" x="-340" y="-51">pi_1:=1</label>
+		</transition>
+		<transition id="id62">
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="guard" x="-263" y="-187">p2 &lt; p1</label>
+			<label kind="assignment" x="-297" y="-136">pi_2:= 1</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+
+T1 = Task1();
+T2 = Task2();
+Periodcheck = period_checker();
+Scheduler= scheduler();
+
+// List one or more processes to be composed into a system.
+system T1,Periodcheck,T2,Scheduler;
+</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2024-06-15 15:48:56 +0200">
+			</result>
+		</query>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>
